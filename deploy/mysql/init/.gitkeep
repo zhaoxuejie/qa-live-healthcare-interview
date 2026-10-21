@@ -1,0 +1,3 @@
+# 该目录挂载到 MySQL 容器的 /docker-entrypoint-initdb.d
+# 容器首次初始化（数据卷为空）时按文件名顺序执行 *.sql
+# 具体脚本由 T06 提供：01_schema.sql / 02_seed_doctors.sql / 03_seed_patient.sql

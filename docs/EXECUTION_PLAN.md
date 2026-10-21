@@ -134,11 +134,11 @@
   - 挂载 `./deploy/mysql/init:/docker-entrypoint-initdb.d:ro`（供 T06 初始化）
 - **前置**：本机 Docker Desktop 需启动（当前 daemon 未运行）；镜像拉取若失败，配置国内镜像加速后重试。
 - **验收标准**
-  - [ ] `docker compose up -d` 成功，`docker compose ps` 中 mysql 为 `healthy`、phpmyadmin 为 `Up`
-  - [ ] `curl.exe -I http://localhost:8082/` 返回 200
-  - [ ] 宿主机可用 `mysql` 客户端或 `docker exec` 连入，`SELECT VERSION()` 返回 8.x
-  - [ ] `docker compose down` / `down -v` 可重复执行；`down -v && up -d` 后初始化脚本重新生效
-  - [ ] 端口不冲突（3306 / 8082；8080/8081 已被后端占用）
+  - [x] `docker compose up -d` 成功，`docker compose ps` 中 mysql 为 `healthy`、phpmyadmin 为 `Up`
+  - [x] `curl.exe -I http://localhost:8082/` 返回 200
+  - [x] 宿主机可用 `mysql` 客户端或 `docker exec` 连入，`SELECT VERSION()` 返回 8.x
+  - [x] `docker compose down` / `down -v` 可重复执行；`down -v && up -d` 后初始化脚本重新生效
+  - [x] 端口不冲突（3306 / 8082；8080/8081 已被后端占用）
 - **依赖**：T01。
 
 ### T06 需求 2：数据库 schema 与医生种子数据
@@ -385,6 +385,7 @@
 ### T21 推送分支、创建 PR、交付
 
 - **目标**：把分支推到自己的代码库并向 `main` 提 PR。
+- **执行归属**：由用户本人执行；AI 不执行 push、不创建 PR（2026-10-21 用户指示）。
 - **步骤**
   1. `git status` 确认干净；`git log --oneline main..HEAD` 复核提交
   2. `git push -u origin feature-interview-1021`（**推送前确认 7890 代理在线**）
@@ -433,7 +434,7 @@
 
 ## 5. 执行看板
 
-> 状态：⬜ 未开始 / 🟨 进行中 / ✅ 已完成 / ⛔ 阻塞（需确认）
+> 状态：⬜ 未开始 / 🟨 进行中 / ✅ 已完成 / ⛔ 阻塞（需确认） / 👤 用户自执行
 
 | 编号 | 任务 | 状态 | 完成时间 | 备注 |
 |---|---|---|---|---|
@@ -442,7 +443,7 @@
 | T02 | i18n 基础设施 | ✅ | 2026-10-21 | vue-i18n 11.4.16；运行时已验证 localStorage 恢复与默认回退 |
 | T03 | 首页文案 + 语言下拉 | ✅ | 2026-10-21 | CDP 点击验证无刷新切换；仅首页显示 |
 | T04 | 需求 1 回归（M1） | ✅ | 2026-10-21 | 3 轮切换 + 4 页面回归通过；M1 完成 |
-| T05 | docker-compose | ⬜ | — | 需先启动 Docker Desktop |
+| T05 | docker-compose | ✅ | 2026-10-21 | MySQL 8.0.46（8.4 镜像源拉取停滞，按计划允许改用 8.0）+ phpMyAdmin 5；down -v 可复现 |
 | T06 | schema + 医生种子 | ⬜ | — | |
 | T07 | 医生列表 API | ⬜ | — | |
 | T08 | 前端改 API | ⬜ | — | |
@@ -458,7 +459,7 @@
 | T18 | prompts.md | ⬜ | — | |
 | T19 | 设计文档 | ⬜ | — | |
 | T20 | 视频脚本与录制 | ⬜ | — | |
-| T21 | 推送 + PR | ⬜ | — | 需 7890 代理在线 |
+| T21 | 推送 + PR | 👤 用户自执行 | — | 按用户指示，AI 不推送；需 7890 代理在线 |
 
 ---
 
