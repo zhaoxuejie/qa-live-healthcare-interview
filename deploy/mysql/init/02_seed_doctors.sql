@@ -4,6 +4,8 @@
 -- 说明：password 仅用于演示，接口不会返回该字段
 -- =============================================================
 
+SET NAMES utf8mb4;
+
 USE qa_healthcare;
 
 INSERT INTO doctor (id, username, password, name, title, department, avatar, experience, specialties, is_active)

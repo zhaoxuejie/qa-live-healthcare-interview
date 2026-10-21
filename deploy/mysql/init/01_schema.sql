@@ -4,6 +4,8 @@
 -- 字符集统一 utf8mb4，排序规则 utf8mb4_unicode_ci
 -- =============================================================
 
+SET NAMES utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS qa_healthcare
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
