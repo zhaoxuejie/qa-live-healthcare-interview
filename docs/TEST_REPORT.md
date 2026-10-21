@@ -38,6 +38,25 @@ qa-phpmyadmin   Up
 /actuator/health UP（db: UP）
 ```
 
+### 1.3 被测接口清单
+
+Base URL：`http://localhost:8080`
+
+| # | 方法 | 路径 | 用途 | 鉴权 | 对应用例 | 覆盖场景 |
+|---|---|---|---|---|---|---|
+| 1 | GET | `/api/doctors` | 医生列表（全量 / 仅在诊） | 无 | DOC-01~05 | 200 且 5 条；`active=true` 4 条；无 `password`；400 非法参数；中文正确 |
+| 2 | POST | `/api/auth/patient/register` | 患者注册 | 无 | AUTH-01~04 | 201 + token；409 重复用户名；400 弱密码；400 缺字段 |
+| 3 | POST | `/api/auth/patient/login` | 患者登录 | 无 | AUTH-05~09 | 200 + token（43 位）；401 密码错误；401 不存在用户；失败文案一致防枚举 |
+| 4 | GET | `/api/auth/patient/me` | 获取当前患者 | `Authorization: Bearer <token>` | AUTH-10、11、12、14 | 200 返回患者；401 无 token / 伪造 token / 登出后 token |
+| 5 | POST | `/api/auth/patient/logout` | 患者登出 | `Authorization: Bearer <token>` | AUTH-13 | 204 空响应 |
+| 6 | GET | `/actuator/health` | 服务健康检查 | 无 | 前置检查（不计入 19 条） | 200，`status=UP`，`db=UP` |
+
+说明：
+
+- 共 **5 个业务接口** + 1 个健康检查端点，全部列入上表。
+- 医生登录 `POST /api/doctors/login` **不在本报告范围**：它在 T14 前端回归中以 UI 方式验证（`dr-zhang-wei/123456` 登录并进入诊室）。
+- 问题提交/查询为前端内存逻辑，无后端接口，因此无对应用例。
+
 ---
 
 ## 2. 执行结果汇总
