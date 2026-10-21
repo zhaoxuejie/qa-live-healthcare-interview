@@ -91,10 +91,10 @@
   - `web/qa-web/src/main.ts` 注册 i18n
 - **步骤**：`npm install vue-i18n`（npmmirror）→ 建资源文件 → 建实例 → `app.use(i18n)`。
 - **验收标准**
-  - [ ] `ls web/qa-web/src/locales` 至少包含 `zh-CN.ts`、`en-US.ts`
-  - [ ] `main.ts` 中 `app.use(i18n)` 生效，页面无控制台报错
-  - [ ] `npm run build` 通过（`vue-tsc` 严格模式无错）
-  - [ ] 刷新页面后语言取 `localStorage` 值；无值时默认中文
+  - [x] `ls web/qa-web/src/locales` 至少包含 `zh-CN.ts`、`en-US.ts`
+  - [x] `main.ts` 中 `app.use(i18n)` 生效，页面无控制台报错
+  - [x] `npm run build` 通过（`vue-tsc` 严格模式无错）
+  - [x] 刷新页面后语言取 `localStorage` 值；无值时默认中文
 - **依赖**：T01。
 
 ### T03 需求 1：首页文案接入 + 右上角语言下拉
@@ -439,7 +439,7 @@
 |---|---|---|---|---|
 | T00 | 建分支与基线确认 | ✅ | 2026-10-21 | `feature-interview-1021` @ 4094c55 |
 | T01 | docs 骨架与约定 | ✅ | 2026-10-21 | 本文件（29 KB / 107 条验收） |
-| T02 | i18n 基础设施 | ⬜ | — | |
+| T02 | i18n 基础设施 | ✅ | 2026-10-21 | vue-i18n 11.4.16；运行时已验证 localStorage 恢复与默认回退 |
 | T03 | 首页文案 + 语言下拉 | ⬜ | — | |
 | T04 | 需求 1 回归（M1） | ⬜ | — | |
 | T05 | docker-compose | ⬜ | — | 需先启动 Docker Desktop |
