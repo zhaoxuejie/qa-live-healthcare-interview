@@ -1,5 +1,9 @@
 <template>
   <div class="home">
+    <div v-if="doctorsError" class="load-error">
+      <a-alert type="error" show-icon :message="'医生数据加载失败：' + doctorsError" />
+      <a-button type="primary" @click="retryLoadDoctors">重试</a-button>
+    </div>
     <section class="hero">
       <div class="hero-content">
         <h1>{{ $t('home.heroTitle') }}</h1>
@@ -105,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { store } from '../store';
 import {
@@ -120,6 +124,15 @@ const router = useRouter();
 
 const statistics = computed(() => store.getStatistics());
 const activeDoctors = computed(() => store.getActiveDoctors());
+const doctorsError = computed(() => store.state.doctorsError);
+
+const retryLoadDoctors = () => {
+  store.loadDoctors(true);
+};
+
+onMounted(() => {
+  store.loadDoctors();
+});
 
 const navigateTo = (path: string) => {
   router.push(path);
@@ -376,5 +389,18 @@ const navigateTo = (path: string) => {
   .rooms-grid {
     grid-template-columns: 1fr;
   }
+}
+.load-error {
+  max-width: 1200px;
+  margin: 16px auto 0;
+  padding: 0 24px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.load-error :deep(.ant-alert) {
+  flex: 1;
 }
 </style>

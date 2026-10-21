@@ -1,20 +1,10 @@
 import { reactive } from 'vue';
-import doctorData from '../data/doctor-user-list.json';
+import { fetchDoctors, loginDoctor as loginDoctorApi } from '../api/doctors';
+import type { Doctor } from '../api/doctors';
 import patientData from '../data/patient-user.json';
 import questionData from '../data/question-list.json';
 
-export interface Doctor {
-  id: string;
-  username: string;
-  password: string;
-  name: string;
-  title: string;
-  department: string;
-  avatar: string;
-  experience: string;
-  specialties: string[];
-  isActive: boolean;
-}
+export type { Doctor } from '../api/doctors';
 
 export interface Patient {
   id: string;
@@ -39,6 +29,8 @@ export interface Question {
 
 interface State {
   doctors: Doctor[];
+  doctorsLoading: boolean;
+  doctorsError: string | null;
   patients: Patient[];
   questions: Question[];
   currentDoctor: Doctor | null;
@@ -46,7 +38,9 @@ interface State {
 }
 
 const state = reactive<State>({
-  doctors: doctorData as Doctor[],
+  doctors: [],
+  doctorsLoading: false,
+  doctorsError: null,
   patients: patientData as Patient[],
   questions: questionData as Question[],
   currentDoctor: null,
@@ -56,15 +50,35 @@ const state = reactive<State>({
 export const store = {
   state,
 
-  loginDoctor(username: string, password: string): Doctor | null {
-    const doctor = state.doctors.find(
-      d => d.username === username && d.password === password
-    );
-    if (doctor) {
+  /**
+   * 从后端加载医生列表；已加载过则复用缓存，force=true 强制刷新。
+   */
+  async loadDoctors(force = false): Promise<void> {
+    if (state.doctorsLoading) {
+      return;
+    }
+    if (!force && state.doctors.length > 0) {
+      return;
+    }
+    state.doctorsLoading = true;
+    state.doctorsError = null;
+    try {
+      state.doctors = await fetchDoctors();
+    } catch (error) {
+      state.doctorsError = error instanceof Error ? error.message : '医生数据加载失败';
+    } finally {
+      state.doctorsLoading = false;
+    }
+  },
+
+  async loginDoctor(username: string, password: string): Promise<Doctor | null> {
+    try {
+      const doctor = await loginDoctorApi(username, password);
       state.currentDoctor = doctor;
       return doctor;
+    } catch {
+      return null;
     }
-    return null;
   },
 
   logoutDoctor() {

@@ -209,7 +209,8 @@ const availableDoctors = computed(() => {
     : store.getActiveDoctors();
 });
 
-onMounted(() => {
+onMounted(async () => {
+  await store.loadDoctors();
   const doctorUsername = route.params.doctorUsername as string;
   if (doctorUsername) {
     const doctor = store.getDoctorByUsername(doctorUsername);

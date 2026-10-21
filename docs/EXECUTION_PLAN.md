@@ -187,13 +187,14 @@
   - `web/qa-web/src/store/index.ts`：删除 `doctor-user-list.json` 导入；新增 `loadDoctors()` 与加载/错误状态
   - `web/qa-web/src/views/Doctors.vue` / `Home.vue`：改为使用 API 数据，含 loading 骨架与失败提示（可重试）
   - `web/qa-web/.env.development`（可选）：`VITE_API_BASE_URL=http://localhost:8080`
+  - 医生登录改走 `POST /api/doctors/login`（删除 JSON 后避免医生登录回归；接口已实现）
 - **验收标准**
-  - [ ] `rg "doctor-user-list" web/qa-web/src` 无引用（种子数据仅保留在 `deploy/mysql/init`）
-  - [ ] 打开 `/doctors` 显示 5 位医生，数据来自接口（Network 可见 `GET /api/doctors` 200）
-  - [ ] 首页统计（医生数 5、在线诊室 4）与首页开放诊室卡片=4 张，与 DB 一致
-  - [ ] 停掉后端刷新页面：显示明确错误提示与「重试」按钮，不白屏、不报未捕获异常
-  - [ ] 后端恢复后点重试可正常加载
-  - [ ] `npm run build` 通过
+  - [x] `rg "doctor-user-list" web/qa-web/src` 无引用（种子数据仅保留在 `deploy/mysql/init`）
+  - [x] 打开 `/doctors` 显示 5 位医生，数据来自接口（Network 可见 `GET /api/doctors` 200）
+  - [x] 首页统计（医生数 5、在线诊室 4）与首页开放诊室卡片=4 张，与 DB 一致
+  - [x] 停掉后端刷新页面：显示明确错误提示与「重试」按钮，不白屏、不报未捕获异常
+  - [x] 后端恢复后点重试可正常加载
+  - [x] `npm run build` 通过
 - **依赖**：T07。
 
 ### T09 需求 2 联调验收（M2 门禁）
@@ -447,7 +448,7 @@
 | T05 | docker-compose | ✅ | 2026-10-21 | MySQL 8.0.46（8.4 镜像源拉取停滞，按计划允许改用 8.0）+ phpMyAdmin 5；down -v 可复现 |
 | T06 | schema + 医生种子 | ✅ | 2026-10-21 | 3 表 + 5 医生；doc004 停诊；utf8mb4；患者种子推迟到 T12 |
 | T07 | 医生列表 API | ✅ | 2026-10-21 | `GET /api/doctors`(+active)；无 password；DB 挂→500；utf8mb4 乱码已修复 |
-| T08 | 前端改 API | ⬜ | — | |
+| T08 | 前端改 API | ✅ | 2026-10-21 | 删除医生 JSON；Doctors/Home 走 API；错误重试验证；医生登录改 DB |
 | T09 | 联调验收（M2） | ⬜ | — | |
 | T10 | PRD 模板 | ⬜ | — | |
 | T11 | 患者登录 PRD | ⬜ | — | |

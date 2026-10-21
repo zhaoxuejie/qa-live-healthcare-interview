@@ -6,7 +6,18 @@
     </div>
 
     <div class="doctors-container">
-      <div class="doctors-grid">
+      <a-alert
+        v-if="doctorsError"
+        type="error"
+        show-icon
+        :message="'医生数据加载失败：' + doctorsError"
+        class="page-alert"
+      />
+      <a-button v-if="doctorsError" type="primary" class="retry-btn" @click="retryLoadDoctors">
+        重试
+      </a-button>
+      <a-skeleton v-if="loading" active :paragraph="{ rows: 6 }" />
+      <div v-else class="doctors-grid">
         <a-card
           v-for="doctor in allDoctors"
           :key="doctor.id"
@@ -48,13 +59,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { store, Doctor } from '../store';
 
 const router = useRouter();
 
 const allDoctors = computed(() => store.state.doctors);
+const loading = computed(() => store.state.doctorsLoading);
+const doctorsError = computed(() => store.state.doctorsError);
+
+const retryLoadDoctors = () => {
+  store.loadDoctors(true);
+};
+
+onMounted(() => {
+  store.loadDoctors();
+});
 
 const goToConsultation = (doctor: Doctor) => {
   router.push(`/consultation/${doctor.username}`);
@@ -173,5 +194,12 @@ const goToConsultation = (doctor: Doctor) => {
   .doctors-grid {
     grid-template-columns: 1fr;
   }
+}
+.page-alert {
+  margin-bottom: 16px;
+}
+
+.retry-btn {
+  margin-bottom: 24px;
 }
 </style>
