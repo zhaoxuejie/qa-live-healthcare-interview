@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DoctorService {
@@ -23,5 +24,18 @@ public class DoctorService {
                 ? doctorRepository.findByIsActiveTrueOrderByIdAsc()
                 : doctorRepository.findAllByOrderByIdAsc();
         return doctors.stream().map(DoctorDto::from).toList();
+    }
+
+    /**
+     * 医生登录：演示项目密码以明文存于库中（API 不返回），仅做等值校验。
+     */
+    @Transactional(readOnly = true)
+    public Optional<DoctorDto> login(String username, String password) {
+        if (username == null || password == null) {
+            return Optional.empty();
+        }
+        return doctorRepository.findByUsername(username)
+                .filter(doctor -> password.equals(doctor.getPassword()))
+                .map(DoctorDto::from);
     }
 }
