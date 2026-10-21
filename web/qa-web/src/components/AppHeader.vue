@@ -23,22 +23,56 @@
           关于
         </a-menu-item>
       </a-menu>
-      <a-button type="primary" class="login-btn" @click="navigateTo('/doctor/login')">
-        <UserOutlined />
-        医生登录
-      </a-button>
+      <div class="header-actions">
+        <a-dropdown v-if="isHome" trigger="click" placement="bottomRight">
+          <a-button type="text" class="lang-btn">
+            <GlobalOutlined />
+            {{ currentLocaleLabel }}
+          </a-button>
+          <template #overlay>
+            <a-menu :selected-keys="[locale]" @click="handleLocaleClick">
+              <a-menu-item key="zh-CN">中文</a-menu-item>
+              <a-menu-item key="en-US">English</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+        <a-button type="primary" class="login-btn" @click="navigateTo('/doctor/login')">
+          <UserOutlined />
+          医生登录
+        </a-button>
+      </div>
     </div>
   </a-layout-header>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { HomeOutlined, MessageOutlined, TeamOutlined, InfoCircleOutlined, UserOutlined } from '@ant-design/icons-vue';
+import { useI18n } from 'vue-i18n';
+import { setLocale, type AppLocale } from '../i18n';
+import {
+  HomeOutlined,
+  MessageOutlined,
+  TeamOutlined,
+  InfoCircleOutlined,
+  UserOutlined,
+  GlobalOutlined
+} from '@ant-design/icons-vue';
 
 const router = useRouter();
 const route = useRoute();
+const { locale } = useI18n();
 const selectedKeys = ref<string[]>(['home']);
+
+const isHome = computed(() => route.name === 'Home');
+const currentLocaleLabel = computed(() => (locale.value === 'en-US' ? 'English' : '中文'));
+
+const handleLocaleClick = (info: { key: string | number }) => {
+  const key = String(info.key);
+  if (key === 'zh-CN' || key === 'en-US') {
+    setLocale(key as AppLocale);
+  }
+};
 
 watch(() => route.path, (newPath) => {
   if (newPath === '/') {
@@ -116,5 +150,20 @@ const navigateTo = (path: string) => {
 .login-btn:hover {
   background: #73d13d;
   border-color: #73d13d;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lang-btn {
+  padding: 0 8px;
+  color: #333;
+}
+
+.lang-btn:hover {
+  color: #1890ff;
 }
 </style>
