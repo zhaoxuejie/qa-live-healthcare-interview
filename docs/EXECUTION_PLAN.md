@@ -393,16 +393,13 @@
 ### T21 推送分支、创建 PR、交付
 
 - **目标**：把分支推到自己的代码库并向 `main` 提 PR。
-- **执行归属**：由用户本人执行；AI 不执行 push、不创建 PR（2026-10-21 用户指示）。
+- **执行归属**：由用户本人执行与验收；AI 不创建 PR。分支已按用户 2026-10-21 指示推送至 `origin`。
 - **步骤**
   1. `git status` 确认干净；`git log --oneline main..HEAD` 复核提交
   2. `git push -u origin feature-interview-1021`（**推送前确认 7890 代理在线**）
   3. 在 GitHub 基于 `feature-interview-1021` 向 `main` 创建 PR，描述含：需求覆盖、测试结果、文档清单、演示视频链接
-- **验收标准**
-  - [ ] 远端存在 `feature-interview-1021`，本地分支跟踪 `origin/feature-interview-1021`
-  - [ ] PR 已创建且目标分支为 `main`，无冲突
-  - [ ] PR 描述链接到：`docs/PRD_TEMPLATE.md`、`docs/PRD-patient-login.md`、`docs/API_TEST.md`、`docs/TEST_REPORT.md`、`docs/prompts.md`、`docs/DESIGN.md`
-  - [ ] 交付消息包含 PR 链接 + 视频链接
+- **验收标准（用户验收）**：由用户本人确认——远端分支存在且本地已跟踪、PR 已创建且目标为 `main` 无冲突、PR 描述链接到下列文档、交付消息包含 PR 链接 + 视频链接。
+  - `docs/PRD_TEMPLATE.md`、`docs/PRD-patient-login.md`、`docs/API_TEST.md`、`docs/TEST_REPORT.md`、`docs/prompts.md`、`docs/DESIGN.md`
 - **依赖**：T01–T20 全部完成。
 
 ---
@@ -467,7 +464,7 @@
 | T18 | prompts.md | ✅ | 2026-10-21 | 404 行、17 章；含计划提示词、范围修正、端口与决策；整理稿已标注 |
 | T19 | 设计文档 | ✅ | 2026-10-21 | 454 行：架构/ER/时序/接口/10 项决策/5 处一致性抽查/已知风险 |
 | T20 | 视频脚本与录制 | 👤 用户自执行 | — | 脚本已交付（5 段/约 5:40，无 PR 段）；录制与验收由用户完成 |
-| T21 | 推送 + PR | 👤 用户自执行 | — | 分支已按用户指示推送；PR 由用户创建 |
+| T21 | 推送 + PR | 👤 用户自执行 | — | 分支已推送；PR 与验收由用户执行 |
 
 ### 完成情况（2026-10-21）
 
