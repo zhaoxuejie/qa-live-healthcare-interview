@@ -1,13 +1,24 @@
 import { reactive } from 'vue';
 import { fetchDoctors, loginDoctor as loginDoctorApi } from '../api/doctors';
 import type { Doctor } from '../api/doctors';
-import patientData from '../data/patient-user.json';
+import {
+  clearPatientToken,
+  fetchCurrentPatient,
+  loginPatient as loginPatientApi,
+  logoutPatient as logoutPatientApi,
+  readPatientToken,
+  registerPatient as registerPatientApi,
+  savePatientToken,
+  type ApiPatient,
+  type RegisterPayload
+} from '../api/auth';
 import questionData from '../data/question-list.json';
 
 export type { Doctor } from '../api/doctors';
 
 export interface Patient {
   id: string;
+  username: string;
   name: string;
   birthday: string;
   phone: string;
@@ -31,7 +42,6 @@ interface State {
   doctors: Doctor[];
   doctorsLoading: boolean;
   doctorsError: string | null;
-  patients: Patient[];
   questions: Question[];
   currentDoctor: Doctor | null;
   currentPatient: Patient | null;
@@ -41,11 +51,21 @@ const state = reactive<State>({
   doctors: [],
   doctorsLoading: false,
   doctorsError: null,
-  patients: patientData as Patient[],
   questions: questionData as Question[],
   currentDoctor: null,
   currentPatient: null,
 });
+
+function mapPatient(patient: ApiPatient): Patient {
+  return {
+    id: String(patient.id),
+    username: patient.username,
+    name: patient.name,
+    birthday: patient.birthday ?? '',
+    phone: patient.phone ?? '',
+    gender: patient.gender ?? '',
+  };
+}
 
 export const store = {
   state,
@@ -85,27 +105,46 @@ export const store = {
     state.currentDoctor = null;
   },
 
-  verifyPatient(name: string, birthday: string): Patient {
-    let patient = state.patients.find(
-      p => p.name === name && p.birthday === birthday
-    );
-
-    if (!patient) {
-      patient = {
-        id: `patient${Date.now()}`,
-        name,
-        birthday,
-        phone: '',
-        gender: '',
-      };
-      state.patients.push(patient);
-    }
-
-    state.currentPatient = patient;
-    return patient;
+  async loginPatient(username: string, password: string): Promise<Patient> {
+    const result = await loginPatientApi(username, password);
+    savePatientToken(result.token);
+    state.currentPatient = mapPatient(result.patient);
+    return state.currentPatient;
   },
 
-  logoutPatient() {
+  async registerPatient(payload: RegisterPayload): Promise<Patient> {
+    const result = await registerPatientApi(payload);
+    savePatientToken(result.token);
+    state.currentPatient = mapPatient(result.patient);
+    return state.currentPatient;
+  },
+
+  /**
+   * 页面加载时用本地 token 恢复登录态；token 失效则静默清除。
+   */
+  async restorePatientSession(): Promise<void> {
+    const token = readPatientToken();
+    if (!token) {
+      return;
+    }
+    try {
+      state.currentPatient = mapPatient(await fetchCurrentPatient(token));
+    } catch {
+      clearPatientToken();
+      state.currentPatient = null;
+    }
+  },
+
+  async logoutPatient(): Promise<void> {
+    const token = readPatientToken();
+    if (token) {
+      try {
+        await logoutPatientApi(token);
+      } catch {
+        // 服务端不可用时也允许本地登出
+      }
+    }
+    clearPatientToken();
     state.currentPatient = null;
   },
 

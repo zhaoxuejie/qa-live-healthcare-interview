@@ -29,6 +29,10 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { ...headers, ...(init?.headers as Record<string, string> | undefined) },
   });
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   let body: ApiEnvelope<T> | undefined;
   try {
     body = (await response.json()) as ApiEnvelope<T>;

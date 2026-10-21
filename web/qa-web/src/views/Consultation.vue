@@ -3,46 +3,80 @@
     <div class="consultation-container">
       <div v-if="!currentPatient" class="auth-section">
         <div class="auth-card">
-          <h1>患者身份验证</h1>
-          <p>请输入您的姓名和生日以验证身份</p>
-          <a-form
-            :model="authForm"
-            :rules="authRules"
-            @finish="verifyPatient"
-            layout="vertical"
-          >
-            <a-form-item label="姓名" name="name">
-              <a-input
-                v-model:value="authForm.name"
-                size="large"
-                placeholder="请输入您的姓名"
+          <h1>患者登录</h1>
+          <p>登录后即可提交和查看您的问诊问题</p>
+          <a-tabs v-model:activeKey="authTab" @change="clearAuthError">
+            <a-tab-pane key="login" tab="登录">
+              <a-form
+                :model="loginForm"
+                :rules="loginRules"
+                @finish="handleLogin"
+                layout="vertical"
               >
-                <template #prefix>
-                  <UserOutlined />
-                </template>
-              </a-input>
-            </a-form-item>
+                <a-form-item label="用户名" name="username">
+                  <a-input v-model:value="loginForm.username" size="large" placeholder="请输入用户名">
+                    <template #prefix>
+                      <UserOutlined />
+                    </template>
+                  </a-input>
+                </a-form-item>
+                <a-form-item label="密码" name="password">
+                  <a-input-password v-model:value="loginForm.password" size="large" placeholder="请输入密码">
+                    <template #prefix>
+                      <LockOutlined />
+                    </template>
+                  </a-input-password>
+                </a-form-item>
+                <a-form-item>
+                  <a-button type="primary" html-type="submit" size="large" block :loading="authSubmitting">
+                    登录
+                  </a-button>
+                </a-form-item>
+              </a-form>
+              <a-alert v-if="authError" type="error" :message="authError" show-icon class="auth-error" />
+            </a-tab-pane>
 
-            <a-form-item label="生日" name="birthday">
-              <a-date-picker
-                v-model:value="authForm.birthday"
-                size="large"
-                format="YYYY-MM-DD"
-                placeholder="请选择您的生日"
-                style="width: 100%"
-              />
-            </a-form-item>
-
-            <a-form-item>
-              <a-button type="primary" html-type="submit" size="large" block>
-                验证身份
-              </a-button>
-            </a-form-item>
-          </a-form>
+            <a-tab-pane key="register" tab="注册">
+              <a-form
+                :model="registerForm"
+                :rules="registerRules"
+                @finish="handleRegister"
+                layout="vertical"
+              >
+                <a-form-item label="用户名" name="username">
+                  <a-input v-model:value="registerForm.username" size="large" placeholder="4-32 位字母、数字、下划线或连字符" />
+                </a-form-item>
+                <a-form-item label="密码" name="password">
+                  <a-input-password v-model:value="registerForm.password" size="large" placeholder="至少 6 位" />
+                </a-form-item>
+                <a-form-item label="姓名" name="name">
+                  <a-input v-model:value="registerForm.name" size="large" placeholder="请输入您的姓名" />
+                </a-form-item>
+                <a-form-item label="生日（选填）" name="birthday">
+                  <a-date-picker
+                    v-model:value="registerForm.birthday"
+                    size="large"
+                    format="YYYY-MM-DD"
+                    placeholder="请选择生日"
+                    style="width: 100%"
+                  />
+                </a-form-item>
+                <a-form-item label="手机号（选填）" name="phone">
+                  <a-input v-model:value="registerForm.phone" size="large" placeholder="请输入手机号" />
+                </a-form-item>
+                <a-form-item>
+                  <a-button type="primary" html-type="submit" size="large" block :loading="authSubmitting">
+                    注册并登录
+                  </a-button>
+                </a-form-item>
+              </a-form>
+              <a-alert v-if="authError" type="error" :message="authError" show-icon class="auth-error" />
+            </a-tab-pane>
+          </a-tabs>
 
           <a-alert
-            message="提示"
-            description="输入任意姓名和生日即可使用。首次输入会自动创建账户,再次输入相同信息即可登录。"
+            message="演示账号"
+            description="用户名 demo_patient，密码 123456"
             type="info"
             show-icon
           />
@@ -59,7 +93,7 @@
             </div>
           </div>
           <div class="portal-actions">
-            <a-button @click="logoutPatient">
+            <a-button @click="handleLogout">
               <LogoutOutlined />
               切换用户
             </a-button>
@@ -169,6 +203,7 @@ import { message } from 'ant-design-vue';
 import dayjs, { Dayjs } from 'dayjs';
 import {
   UserOutlined,
+  LockOutlined,
   LogoutOutlined,
   PlusOutlined
 } from '@ant-design/icons-vue';
@@ -185,14 +220,42 @@ const myQuestions = computed(() =>
 
 const selectedDoctor = ref<Doctor | null>(null);
 
-const authForm = reactive({
-  name: '',
-  birthday: null as Dayjs | null,
+const authTab = ref<'login' | 'register'>('login');
+const authSubmitting = ref(false);
+const authError = ref('');
+
+const clearAuthError = () => {
+  authError.value = '';
+};
+
+const loginForm = reactive({
+  username: '',
+  password: '',
 });
 
-const authRules = {
+const loginRules = {
+  username: [{ required: true, message: '请输入用户名' }],
+  password: [{ required: true, message: '请输入密码' }],
+};
+
+const registerForm = reactive({
+  username: '',
+  password: '',
+  name: '',
+  birthday: null as Dayjs | null,
+  phone: '',
+});
+
+const registerRules = {
+  username: [
+    { required: true, message: '请输入用户名' },
+    { pattern: /^[A-Za-z0-9_-]{4,32}$/, message: '4-32 位字母、数字、下划线或连字符' },
+  ],
+  password: [
+    { required: true, message: '请输入密码' },
+    { min: 6, max: 64, message: '密码长度需为 6-64 位' },
+  ],
   name: [{ required: true, message: '请输入姓名' }],
-  birthday: [{ required: true, message: '请选择生日' }],
 };
 
 const submitModalVisible = ref(false);
@@ -210,7 +273,7 @@ const availableDoctors = computed(() => {
 });
 
 onMounted(async () => {
-  await store.loadDoctors();
+  await Promise.all([store.loadDoctors(), store.restorePatientSession()]);
   const doctorUsername = route.params.doctorUsername as string;
   if (doctorUsername) {
     const doctor = store.getDoctorByUsername(doctorUsername);
@@ -221,30 +284,42 @@ onMounted(async () => {
   }
 });
 
-const verifyPatient = () => {
-  const birthday = authForm.birthday?.format('YYYY-MM-DD');
-  if (!birthday) {
-    message.error('请选择生日');
-    return;
-  }
-
-  const existingPatientCount = store.state.patients.filter(
-    p => p.name === authForm.name && p.birthday === birthday
-  ).length;
-
-  store.verifyPatient(authForm.name, birthday);
-
-  if (existingPatientCount > 0) {
-    message.success('验证成功,欢迎回来!');
-  } else {
-    message.success('首次登录,已为您创建账户!');
+const handleLogin = async () => {
+  authSubmitting.value = true;
+  authError.value = '';
+  try {
+    const patient = await store.loginPatient(loginForm.username, loginForm.password);
+    message.success(`欢迎回来，${patient.name}`);
+  } catch (error) {
+    authError.value = error instanceof Error ? error.message : '登录失败，请稍后重试';
+  } finally {
+    authSubmitting.value = false;
   }
 };
 
-const logoutPatient = () => {
-  store.logoutPatient();
+const handleRegister = async () => {
+  authSubmitting.value = true;
+  authError.value = '';
+  try {
+    const patient = await store.registerPatient({
+      username: registerForm.username,
+      password: registerForm.password,
+      name: registerForm.name,
+      birthday: registerForm.birthday ? registerForm.birthday.format('YYYY-MM-DD') : null,
+      phone: registerForm.phone || null,
+    });
+    message.success(`注册成功，欢迎 ${patient.name}`);
+  } catch (error) {
+    authError.value = error instanceof Error ? error.message : '注册失败，请稍后重试';
+  } finally {
+    authSubmitting.value = false;
+  }
+};
+
+const handleLogout = async () => {
+  await store.logoutPatient();
   selectedDoctor.value = null;
-  message.success('已切换用户');
+  message.success('已退出登录');
 };
 
 const clearSelectedDoctor = () => {
@@ -477,5 +552,8 @@ const formatTime = (time: string) => {
   .portal-actions {
     width: 100%;
   }
+}
+.auth-error {
+  margin-top: 8px;
 }
 </style>
