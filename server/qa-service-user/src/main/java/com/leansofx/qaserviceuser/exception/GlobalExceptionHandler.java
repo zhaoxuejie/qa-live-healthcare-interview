@@ -4,7 +4,9 @@ import com.leansofx.qaserviceuser.common.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,6 +31,19 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<Void> handleUnreadableBody(HttpMessageNotReadableException ex) {
         return ApiResponse.error(40000, "请求体格式不正确");
+    }
+
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ApiResponse<Void>> handleApi(ApiException ex) {
+        return ResponseEntity.status(ex.getStatus())
+                .body(ApiResponse.error(ex.getCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiResponse<Void> handleDataIntegrity(DataIntegrityViolationException ex) {
+        log.warn("数据唯一性冲突: {}", ex.getMostSpecificCause().getMessage());
+        return ApiResponse.error(40900, "用户名已存在");
     }
 
     @ExceptionHandler(DataAccessException.class)
