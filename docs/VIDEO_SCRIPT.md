@@ -241,7 +241,7 @@ EXIT CODE=0
 
 ## 6. 录制后
 
-1. 保存视频为 `docs/demo-video.mp4`，或上传后把链接写入 `docs/`（二选一）。
+1. 保存视频为 `demo-assets/recordings/demo-video.mp4`，或上传后把链接写入 `docs/`（二选一）。
 2. 在 `docs/EXECUTION_PLAN.md` 的 T20 勾选验收项，并把文件/链接位置补到备注。
 3. 若视频超过 7 分钟，优先压缩分镜 4 的注册步骤（可改用已有账号登录），不要删减“改库即变”和“测试全绿”。
 
