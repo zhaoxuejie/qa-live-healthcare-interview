@@ -8,23 +8,23 @@
       <a-menu v-model:selectedKeys="selectedKeys" mode="horizontal" class="nav-menu">
         <a-menu-item key="home" @click="navigateTo('/')">
           <HomeOutlined />
-          首页
+          {{ $t('nav.home') }}
         </a-menu-item>
         <a-menu-item key="consultation" @click="navigateTo('/consultation')">
           <MessageOutlined />
-          问诊
+          {{ $t('nav.consultation') }}
         </a-menu-item>
         <a-menu-item key="doctors" @click="navigateTo('/doctors')">
           <TeamOutlined />
-          医生
+          {{ $t('nav.doctors') }}
         </a-menu-item>
         <a-menu-item key="about" @click="navigateTo('/about')">
           <InfoCircleOutlined />
-          关于
+          {{ $t('nav.about') }}
         </a-menu-item>
       </a-menu>
       <div class="header-actions">
-        <a-dropdown v-if="isHome" trigger="click" placement="bottomRight">
+        <a-dropdown trigger="click" placement="bottomRight">
           <a-button type="text" class="lang-btn">
             <GlobalOutlined />
             {{ currentLocaleLabel }}
@@ -38,7 +38,7 @@
         </a-dropdown>
         <a-button type="primary" class="login-btn" @click="navigateTo('/doctor/login')">
           <UserOutlined />
-          医生登录
+          {{ $t('nav.doctorLogin') }}
         </a-button>
       </div>
     </div>
@@ -64,7 +64,6 @@ const route = useRoute();
 const { locale } = useI18n();
 const selectedKeys = ref<string[]>(['home']);
 
-const isHome = computed(() => route.name === 'Home');
 const currentLocaleLabel = computed(() => (locale.value === 'en-US' ? 'English' : '中文'));
 
 const handleLocaleClick = (info: { key: string | number }) => {
