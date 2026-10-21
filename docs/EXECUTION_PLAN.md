@@ -166,16 +166,16 @@
 - **目标**：在 `qa-service-user` 中提供医生列表接口，供前端医生页使用；**不返回密码**。
 - **产出**
   - `pom.xml` 增加 `spring-boot-starter-data-jpa`、`mysql-connector-j`、`spring-security-crypto`（T12 复用）
-  - `application.properties` 增加 datasource（`jdbc:mysql://localhost:3306/qa_healthcare?...`，`ddl-auto=validate`）
+  - `application.properties` 增加 datasource（`jdbc:mysql://localhost:3306/qa_healthcare?...`，`ddl-auto=none`：表结构由 init SQL 管理，避免 JSON 列类型校验误报）
   - 代码：`entity/Doctor.java`（`specialties` 用 JSON ↔ List 转换）、`repository/DoctorRepository.java`、`service/DoctorService.java`、`controller/DoctorController.java`、`dto/DoctorDto.java`、`common/ApiResponse.java`、`exception/GlobalExceptionHandler.java`
   - 接口：`GET /api/doctors`（全部）、`GET /api/doctors?active=true`（仅在线）
 - **验收标准**
-  - [ ] `curl.exe -s http://localhost:8080/api/doctors` 返回 200 与统一响应体，`data` 长度 5
-  - [ ] 响应元素含 `id/username/name/title/department/avatar/experience/specialties/isActive`，**不含 `password`**
-  - [ ] `curl.exe -s "http://localhost:8080/api/doctors?active=true"` 返回 4 条
-  - [ ] 数据库不可用时返回 500 + 统一错误体，且不输出堆栈到响应
-  - [ ] `.\mvnw.cmd -s D:\dev\maven-settings.xml test` 通过；`/actuator/health` 仍为 UP
-  - [ ] 既有 CORS 配置对 `/api/**` 生效（浏览器 5173 可跨域调用）
+  - [x] `curl.exe -s http://localhost:8080/api/doctors` 返回 200 与统一响应体，`data` 长度 5
+  - [x] 响应元素含 `id/username/name/title/department/avatar/experience/specialties/isActive`，**不含 `password`**
+  - [x] `curl.exe -s "http://localhost:8080/api/doctors?active=true"` 返回 4 条
+  - [x] 数据库不可用时返回 500 + 统一错误体，且不输出堆栈到响应
+  - [x] `.\mvnw.cmd -s D:\dev\maven-settings.xml test` 通过；`/actuator/health` 仍为 UP
+  - [x] 既有 CORS 配置对 `/api/**` 生效（浏览器 5173 可跨域调用）
 - **依赖**：T06。
 
 ### T08 需求 2：前端医生数据改走 API（联调）
@@ -446,7 +446,7 @@
 | T04 | 需求 1 回归（M1） | ✅ | 2026-10-21 | 3 轮切换 + 4 页面回归通过；M1 完成 |
 | T05 | docker-compose | ✅ | 2026-10-21 | MySQL 8.0.46（8.4 镜像源拉取停滞，按计划允许改用 8.0）+ phpMyAdmin 5；down -v 可复现 |
 | T06 | schema + 医生种子 | ✅ | 2026-10-21 | 3 表 + 5 医生；doc004 停诊；utf8mb4；患者种子推迟到 T12 |
-| T07 | 医生列表 API | ⬜ | — | |
+| T07 | 医生列表 API | ✅ | 2026-10-21 | `GET /api/doctors`(+active)；无 password；DB 挂→500；utf8mb4 乱码已修复 |
 | T08 | 前端改 API | ⬜ | — | |
 | T09 | 联调验收（M2） | ⬜ | — | |
 | T10 | PRD 模板 | ⬜ | — | |
