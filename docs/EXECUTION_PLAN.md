@@ -147,17 +147,17 @@
 - **产出**
   - `deploy/mysql/init/01_schema.sql`：`doctor`、`patient`、`patient_token` 三张表（patient 相关为 T12 预留，可同批建）
   - `deploy/mysql/init/02_seed_doctors.sql`：5 条医生（来自 `web/qa-web/src/data/doctor-user-list.json`）
-  - `deploy/mysql/init/03_seed_patient.sql`：1 条演示患者（如 `demo_patient` / `123456`，BCrypt 哈希，供 T14 演示）
+  - `deploy/mysql/init/03_seed_patient.sql`：1 条演示患者（BCrypt 哈希，供 T14 演示）——**推迟到 T12 生成**（需先用后端 BCrypt 产出哈希）
 - **表设计（验收依据）**
   - `doctor`：`id varchar(32) PK`、`username varchar(64) UNIQUE`、`password varchar(100)`、`name`、`title`、`department`、`avatar varchar(512)`、`experience`、`specialties JSON`、`is_active tinyint(1)`、`created_at`、`updated_at`
   - `patient`：`id bigint AUTO_INCREMENT PK`、`username varchar(64) UNIQUE`、`password_hash varchar(100)`、`name`、`birthday date`、`phone`、`gender`、`created_at`
   - `patient_token`：`token varchar(64) PK`、`patient_id bigint`、`expires_at datetime`、`created_at`
 - **验收标准**
-  - [ ] 三张表存在，`SHOW CREATE TABLE doctor` 显示 `utf8mb4`
-  - [ ] `SELECT COUNT(*) FROM doctor` = 5；`username` 与 JSON 完全一致（`dr-zhang-wei` 等）
-  - [ ] `specialties` 为合法 JSON 数组（如 `["高血压","冠心病","心律失常"]`）
-  - [ ] `is_active` 与 JSON 一致（doc004 为 0，其余 4 条为 1）
-  - [ ] 脚本幂等可重复初始化（`docker compose down -v && up -d` 后数据一致）
+  - [x] 三张表存在，`SHOW CREATE TABLE doctor` 显示 `utf8mb4`
+  - [x] `SELECT COUNT(*) FROM doctor` = 5；`username` 与 JSON 完全一致（`dr-zhang-wei` 等）
+  - [x] `specialties` 为合法 JSON 数组（如 `["高血压","冠心病","心律失常"]`）
+  - [x] `is_active` 与 JSON 一致（doc004 为 0，其余 4 条为 1）
+  - [x] 脚本幂等可重复初始化（`docker compose down -v && up -d` 后数据一致）
 - **依赖**：T05。
 
 ### T07 需求 2：qa-service-user 医生列表 API
@@ -444,7 +444,7 @@
 | T03 | 首页文案 + 语言下拉 | ✅ | 2026-10-21 | CDP 点击验证无刷新切换；仅首页显示 |
 | T04 | 需求 1 回归（M1） | ✅ | 2026-10-21 | 3 轮切换 + 4 页面回归通过；M1 完成 |
 | T05 | docker-compose | ✅ | 2026-10-21 | MySQL 8.0.46（8.4 镜像源拉取停滞，按计划允许改用 8.0）+ phpMyAdmin 5；down -v 可复现 |
-| T06 | schema + 医生种子 | ⬜ | — | |
+| T06 | schema + 医生种子 | ✅ | 2026-10-21 | 3 表 + 5 医生；doc004 停诊；utf8mb4；患者种子推迟到 T12 |
 | T07 | 医生列表 API | ⬜ | — | |
 | T08 | 前端改 API | ⬜ | — | |
 | T09 | 联调验收（M2） | ⬜ | — | |
