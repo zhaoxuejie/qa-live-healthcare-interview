@@ -1,0 +1,20 @@
+﻿API 测试开始，目标: http://localhost:8080
+------------------------------------------------------------
+[PASS] DOC-01 医生列表返回 5 条  HTTP 200, count=5
+[PASS] DOC-02 响应不含 password 字段  password 出现: False
+[PASS] DOC-03 active=true 仅返回 4 条  HTTP 200, count=4
+[PASS] DOC-04 非法参数返回 400 + 业务码  HTTP 400, body={"code":40000,"message":"参数格式不正确: active","data":null}
+[PASS] AUTH-01 注册成功返回 201 + token  HTTP 201, tokenLen=43
+[PASS] AUTH-02 重复用户名返回 409  HTTP 409, body={"code":40900,"message":"用户名已存在","data":null}
+[PASS] AUTH-03 密码不足 6 位返回 400  HTTP 400, body={"code":40000,"message":"密码长度需为 6-64 位","data":null}
+[PASS] AUTH-04 缺少姓名返回 400  HTTP 400, body={"code":40000,"message":"姓名不能为空且不超过 64 字","data":null}
+[PASS] AUTH-05 登录成功返回 token  HTTP 200, tokenLen=43
+[PASS] AUTH-06 密码错误返回 401  HTTP 401, body={"code":40100,"message":"用户名或密码错误","data":null}
+[PASS] AUTH-07 不存在用户返回 401 且文案一致  HTTP 401, body={"code":40100,"message":"用户名或密码错误","data":null}
+[PASS] AUTH-08 有效 token 获取当前用户  HTTP 200, username=api_test_121310
+[PASS] AUTH-09 无 token 返回 401  HTTP 401
+[PASS] AUTH-10 伪造 token 返回 401  HTTP 401
+[PASS] AUTH-11 登出返回 204  HTTP 204
+[PASS] AUTH-12 登出后 token 失效返回 401  HTTP 401
+------------------------------------------------------------
+总计 16 条，通过 16 条，失败 0 条
